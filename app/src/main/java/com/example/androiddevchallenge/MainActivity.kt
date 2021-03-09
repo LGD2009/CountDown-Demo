@@ -109,7 +109,6 @@ fun MyApp(progressModel: CountDownViewModel? = null) {
                         textAlign = TextAlign.Center
                     )
                 }
-
             }
             Spacer(Modifier.height(20.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -138,13 +137,16 @@ fun MyApp(progressModel: CountDownViewModel? = null) {
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
                 Spacer(Modifier.width(20.dp))
-                Button(onClick = {
-                    progressModel?.setMillisInFuture(1000 * timeValue.value)
-                }) {
+                Button(
+                    onClick = {
+                        progressModel?.setMillisInFuture(1000 * timeValue.value)
+                    }
+                ) {
                     Text(text = "设置")
                 }
             }
-            MyButtons(isStart = progressModel?.isStartState?.value ?: false,
+            MyButtons(
+                isStart = progressModel?.isStartState?.value ?: false,
                 onStart = {
                     progressModel?.isStartState?.value = true
                     progressModel?.onStart()
@@ -152,14 +154,17 @@ fun MyApp(progressModel: CountDownViewModel? = null) {
                 onCancel = {
                     progressModel?.isStartState?.value = false
                     progressModel?.onCancel()
-                })
+                }
+            )
         }
     }
 }
 
 @Composable
 fun MyButtons(
-    isStart: Boolean, onStart: () -> Unit, onCancel: () -> Unit
+    isStart: Boolean,
+    onStart: () -> Unit,
+    onCancel: () -> Unit
 ) {
     Spacer(Modifier.height(10.dp))
     Row(verticalAlignment = Alignment.CenterVertically) {
