@@ -24,6 +24,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.progressSemantics
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -38,6 +39,9 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.EditingBuffer
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -61,11 +65,7 @@ class MainActivity : AppCompatActivity() {
 
 @Composable
 fun MyApp(progressModel: CountDownViewModel? = null) {
-    val isStart: MutableState<Boolean> = remember { mutableStateOf(false) }
-    val isPause: MutableState<Boolean> = remember { mutableStateOf(false) }
-    var showDialog by rememberSaveable { mutableStateOf(false) }
-
-    var temp: Float
+    val timeValue = remember { mutableStateOf(10L) }
     val size = 300.dp
     Surface(color = MaterialTheme.colors.background) {
         Column(
@@ -99,32 +99,34 @@ fun MyApp(progressModel: CountDownViewModel? = null) {
                 }
 
             }
-            MyButtons(isStart = isStart.value, isPause = isPause.value,
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                TextField(
+                    modifier = Modifier.width(80.dp),
+                    placeholder = {
+                        Text(text = stringResource(id = R.string.input_second))
+                    },
+                    value = "10",
+                    onValueChange = {
+                        timeValue.value = it.toLong()
+                    },
+                    singleLine = true,
+                    //keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                )
+                Spacer(Modifier.width(20.dp))
+                Button(onClick = {
+                    progressModel?.setMillisInFuture(1000 * timeValue.value)
+                }) {
+                    Text(text = "设置")
+                }
+            }
+            MyButtons(isStart = progressModel?.isStartState?.value ?: false,
                 onStart = {
-                    if (isPause.value) {
-                        temp = progressModel?.progressState?.value ?: 1f
-                        progressModel?.setMillisInFuture((1000 * 60 * temp).toLong())
-                    }
-                    isStart.value = true
-                    isPause.value = false
+                    progressModel?.isStartState?.value = true
                     progressModel?.onStart()
                 },
                 onCancel = {
-                    isStart.value = false
+                    progressModel?.isStartState?.value = false
                     progressModel?.onCancel()
-                },
-                onPause = {
-                    isPause.value = true
-                    temp = progressModel?.progressState?.value ?: 1f
-                    progressModel?.let {
-                        it.onCancel()
-                    }
-                },
-                onSetting = {
-                    if (showDialog) {
-                        //SetTimeDialog(context = , onDismiss =  { showDialog = false })
-                    }
-                    progressModel?.setMillisInFuture(1000 * 60)
                 })
         }
     }
@@ -132,44 +134,21 @@ fun MyApp(progressModel: CountDownViewModel? = null) {
 
 @Composable
 fun MyButtons(
-    isStart: Boolean, isPause: Boolean, onStart: () -> Unit, onCancel: () -> Unit,
-    onPause: () -> Unit, onSetting: () -> Unit
+    isStart: Boolean, onStart: () -> Unit, onCancel: () -> Unit
 ) {
-    Spacer(Modifier.height(60.dp))
+    Spacer(Modifier.height(10.dp))
     Row(verticalAlignment = Alignment.CenterVertically) {
         Button(
-            onClick = if (!isStart || isPause) onStart else onPause,
+            onClick = if (!isStart) onStart else onCancel,
             colors = ButtonDefaults.buttonColors(
-                backgroundColor = if (!isStart || isPause) colorResource(
+                backgroundColor = if (!isStart) colorResource(
                     id = R.color.purple_500
                 ) else Color.Red
             )
         ) {
-            Text(text = if (!isStart || isPause) "开始" else "暂停")
-        }
-        Spacer(Modifier.width(20.dp))
-        Button(onClick = if (!isStart) onSetting else onCancel) {
-            Text(text = if (!isStart) "设置" else "取消")
+            Text(text = if (!isStart) "开始" else "取消", color = Color.White)
         }
     }
-}
-
-@Composable
-fun SetTimeDialog(context: CompositionContext, onDismiss: () -> Unit) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        text = {
-            Text(
-                text = "请设置时间(分钟)",
-                style = MaterialTheme.typography.body2
-            )
-        },
-        confirmButton = {
-            TextButton(onClick = onDismiss) {
-                Text(text = "CLOSE")
-            }
-        }
-    )
 }
 
 @Composable
