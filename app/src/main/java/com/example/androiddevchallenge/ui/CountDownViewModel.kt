@@ -19,8 +19,10 @@ class CountDownViewModel : ViewModel() {
         override fun onTick(millisUntilFinished: Long) {
             println("value=${millisUntilFinished.toFloat()}")
             progressState.value = millisUntilFinished.toFloat() / millisInFuture
-            minuteState.value = String.format("%02d", millisUntilFinished / (1000 * 60)) + ":"
-            secondState.value = String.format("%02d", millisUntilFinished / 1000) + ":"
+            val minute: Int = (millisUntilFinished / (1000 * 60)).toInt()
+            val second: Int = ((millisUntilFinished - minute * 60 * 1000)/ 1000).toInt()
+            minuteState.value = String.format("%02d", minute) + ":"
+            secondState.value = String.format("%02d", second ) + ":"
             val s = (millisUntilFinished % 1000 * 60).toString()
             millisecondState.value = when {
                 s.length > 2 -> {
@@ -47,8 +49,10 @@ class CountDownViewModel : ViewModel() {
         this.millisInFuture = millisInFuture
         progressState.value = 1f
         isStartState.value = false
-        minuteState.value = String.format("%02d", millisInFuture / (1000 * 60)) + ":"
-        secondState.value = String.format("%02d", millisInFuture / 1000) + ":"
+        val minute: Int = (millisInFuture / (1000 * 60)).toInt()
+        val second: Int = ((millisInFuture - minute * 60 * 1000)/ 1000).toInt()
+        minuteState.value = String.format("%02d", minute) + ":"
+        secondState.value = String.format("%02d", second ) + ":"
         millisecondState.value = "00"
     }
 
@@ -62,8 +66,10 @@ class CountDownViewModel : ViewModel() {
             override fun onTick(millisUntilFinished: Long) {
                 println("value=${millisUntilFinished.toFloat()}")
                 progressState.value = millisUntilFinished.toFloat() / millisInFuture
-                minuteState.value = String.format("%02d", millisUntilFinished / (1000 * 60)) + ":"
-                secondState.value = String.format("%02d", millisUntilFinished / 1000) + ":"
+                val minute: Int = (millisUntilFinished / (1000 * 60)).toInt()
+                val second: Int = ((millisUntilFinished - minute * 60 * 1000)/ 1000).toInt()
+                minuteState.value = String.format("%02d", minute) + ":"
+                secondState.value = String.format("%02d", second ) + ":"
                 val s = (millisUntilFinished % 1000 * 60).toString()
                 millisecondState.value = when {
                     s.length > 2 -> {
